@@ -1,0 +1,238 @@
+'''
+Process Queries on Cart
+FULLTIME
+Build a prototype for a cart management service.
+
+An array of integers, items, represents the item ids in the cart initially.
+
+Given another array of q integers, query, your service must perform as follows.
+
+Each integer is an item id to be added to or removed from the cart.
+If the query integer is positive, add the integer representing an item id to the back of the cart.
+If the query integer is negative, remove the first occurrence of the integer from the cart.
+List the final items present in the cart after all the queries are completed.
+It is safe to assume that the cart will not end up empty. The queries only ask for removal of items that are present in the cart. There is no 0 in array query.
+
+Function Description
+
+Complete the function processQueriesOnCart in the editor below.
+
+processQueriesOnCart has the following parameters:
+
+int items[n] : items initially in the cart
+int query[q] : items to add or remove
+
+Example 1 :
+
+Input: items = [1, 2, 1, 2, 1], query = [-1, -1, 3, 4, -3]
+Output: [2, 2, 1, 4]
+Explanation:
+Initially, there are n = 5 items in the cart represented as cart = [1,2,1,2,1] and queries = [-1,-1,3,4,-3]
+
+Query	Task	Cart
+-1	Delete first 1 from cart	[2,1,2,1]
+-1	Delete first 1 from cart	[2,2,1]
+3	Append 3 to cart	[2,2,1,3]
+4	Append 4 to cart	[2,2,1,3,4]
+-3	Delete first 3 from cart	[2,2,1,4]
+Report [2,2,1,4] as the final cart.
+
+
+Example 2 :
+
+Input: items = [5, 1, 2, 2, 4, 6], query = [1, -2, -1, -1]
+Output: [5, 2, 4, 6]
+Explanation:
+items = [5, 1, 2, 2, 4, 6]
+queries = [1, -2, -1, -1]
+
+Query	Task	Cart
+1	Append 1 to cart	[5, 1, 2, 2, 4, 6, 1]
+-2	Delete first 2 from cart	[5, 1, 2, 4, 6, 1]
+-1	Delete first 1 from cart	[5, 2, 4, 6, 1]
+-1	Delete first 1 from cart	[5, 2, 4, 6]
+Report [5, 2, 4, 6] as the final cart.
+
+
+Constraints:
+
+1 <= n, q <= 2 * 10^5
+1 <= items[i] <= 10^9
+-10^9 <= query[i] <= 10^9
+It is guaranteed that query[i] != 0
+
+'''
+
+
+
+from typing import List
+from collections import defaultdict, deque
+
+class Node:
+    def __init__(self, val=None):
+        self.val = val  # Item value
+        self.prev = None  # Previous node pointer
+        self.next = None  # Next node pointer
+
+def processQueriesOnCart(items: List[int], query: List[int]) -> List[int]:
+    item_map = defaultdict(deque)
+    dummy_ptr = Node()  # Dummy head node
+    tail_ptr = dummy_ptr  # Tail pointer starts at dummy head
+
+    # Build the initial doubly linked list and populate the mapping
+    for item in items:
+        item_node = Node(item)
+        item_map[item].append(item_node)
+        item_node.prev = tail_ptr
+        tail_ptr.next = item_node
+        tail_ptr = item_node  # Move tail pointer to the new node
+
+    # Process each query
+    for q in query:
+        if q > 0:
+            # Add item to the back of the cart
+            query_node = Node(q)
+            item_map[q].append(query_node)
+            query_node.prev = tail_ptr
+            tail_ptr.next = query_node
+            tail_ptr = query_node  # Update tail pointer
+        elif q < 0:
+            # Remove the first occurrence of the item
+            val = -q  # Convert to positive to get the item value
+            if item_map[val]:
+                query_node = item_map[val].popleft()
+                # Remove query_node from the linked list
+                if query_node.prev:
+                    query_node.prev.next = query_node.next
+                if query_node.next:
+                    query_node.next.prev = query_node.prev
+                else:
+                    # If query_node is the tail, update tail_ptr
+                    tail_ptr = query_node.prev
+            else:
+                # This situation shouldn't occur based on problem constraints
+                pass
+
+    # Collect the final items in the cart
+    result = []
+    current = dummy_ptr.next  # Start from the node after the dummy head
+    while current:
+        result.append(current.val)
+        current = current.next
+
+    return result
+
+'''
+Time Complexity
+Initial Setup:
+
+Building the doubly linked list (for loop over items):
+For each item in the input items list, a Node is created, and pointers for prev and next are updated.
+This takes constant time per item: 
+𝑂(1)
+O(1).
+Since there are 𝑛
+n items in the items list, this step takes 
+𝑂(𝑛)
+O(n) time.
+Processing Queries (for loop over query):
+
+For each query:
+If q > 0 (adding an item):
+A new Node is created and added to the tail of the doubly linked list. This takes constant time: 
+𝑂(1)
+O(1).
+The item is also appended to the deque corresponding to its value in item_map, which also takes constant time: 
+𝑂(1)
+O(1).
+If q < 0 (removing an item):
+The first occurrence of the corresponding item (from item_map) is retrieved and removed from the deque, which takes constant time: 
+𝑂(1)
+O(1).
+Removing a node from a doubly linked list is also done in constant time: 
+𝑂(1)
+O(1).
+So, for each query, the time complexity is 
+𝑂(1)
+O(1) for both addition and removal operations.
+Let 
+𝑚
+m be the number of queries. Since each query takes constant time, the overall time for this step is 
+𝑂(𝑚)
+O(m).
+Collecting Final Items (while loop over the linked list):
+
+After processing the queries, the code iterates over the entire doubly linked list to collect the remaining items.
+In the worst case, the number of nodes in the list is 
+𝑛+𝑚
+n+m (since 
+𝑚
+m items could be added via queries).
+This step takes 
+𝑂(𝑛+𝑚)
+O(n+m) time.
+Total Time Complexity:
+Initial setup (building the list): 
+𝑂(𝑛)
+O(n)
+Processing the queries: 
+𝑂(𝑚)
+O(m)
+Collecting final items: 
+𝑂(𝑛+𝑚)
+O(n+m)
+Total time complexity: 
+𝑂(𝑛+𝑚)
+O(n+m)
+Space Complexity
+Doubly Linked List:
+
+Each node in the doubly linked list takes 
+𝑂(1)
+O(1) space.
+There are at most 𝑛+𝑚
+n+m nodes in the list (since 
+𝑚
+m items could be added).
+This takes 
+𝑂(𝑛+𝑚)
+O(n+m) space.
+Item Map (item_map):
+
+The item_map is a dictionary that stores a deque for each unique item value. Each deque holds references to nodes in the doubly linked list.
+In the worst case, each deque could hold 
+𝑂(𝑛+𝑚)
+O(n+m) nodes (if every query adds a new item to the cart).
+However, the total number of nodes across all deques will not exceed 
+𝑛+𝑚
+n+m, so the total space for the item_map is also 
+𝑂(𝑛+𝑚)
+O(n+m).
+Result List:
+
+The result list will contain at most 
+𝑛+𝑚
+n+m items, which takes 
+𝑂(𝑛+𝑚)
+O(n+m) space.
+Total Space Complexity:
+Doubly linked list: 
+𝑂(𝑛+𝑚)
+O(n+m)
+Item map (item_map): 
+𝑂(𝑛+𝑚)
+O(n+m)
+Result list: 
+𝑂(𝑛+𝑚)
+O(n+m)
+Total space complexity: 
+𝑂(𝑛+𝑚)
+O(n+m)
+Final Complexity Summary:
+Time complexity: 
+𝑂(𝑛+𝑚)
+O(n+m)
+Space complexity: 
+𝑂(𝑛+𝑚)
+O(n+m)
+'''
