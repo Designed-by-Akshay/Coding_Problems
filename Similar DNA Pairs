@@ -1,0 +1,93 @@
+'''
+A DNA sequence is represented by a string of lowercase letters. Given a pair of DNA sequences, if the scientist is able to remove any number of a letter in sequence1 and any number of a letter in sequence2 to make the strings anagrams, then the sequences are similar.
+
+Given n pairs of DNA sequences, for each pair, attempt to find if they are similar. Return a list of boolean values where boolean[i] indicates for the i'th pair.
+
+
+Function Description
+
+Complete the function getSequence in the editor below.
+
+getSequence has the following parameter(s):
+
+String dna[n][2] : the pairs of DNA sequences.
+
+Returns
+
+boolean[n] : 'true' if the pair is special, and 'false' otherwise
+
+
+Example 1 :
+
+Input: dna = [["safddadfs", "famafmss"]]
+Output: [true]
+Explanation:
+The strings are anagrams after removing all the occurrences of character 'd' from s and character 'm' from t. Return [True].
+Note: It is not required that all instances of a character be removed. For example, given 'aab' and 'ba', one 'a' can be removed from 'aab' to leave 'ab'.
+
+
+Example 2 :
+
+Input: dna = [["abcee", "acdeedb"], ["sljffsajej", "sljsje"]]
+Output: [true, false]
+Explanation:
+For pair 1, remove 'b' from the second string and leave the first string untouched.
+For pair 2, dna1 contains 'f' and 'a' which are not in dna2. They cannot be anagrams after removing only a character from dna1.
+
+
+Constraints:
+
+1 <= n <= 10
+1 <= length of dna[i][0], dna[i][1] <= 10000.
+The strings in dna1 and dna2 consist of lowercase English letters only.
+
+'''
+
+from collections import defaultdict
+
+def is_anagram(seq1:List[int],seq2:List[int])->bool:
+    
+    count1_map = defaultdict(int)
+    count2_map = defaultdict(int)
+    
+    to_remove1 = set()
+    to_remove2 = set()
+    
+    for c in seq1:
+        count1_map[c] += 1
+        
+    for c in seq2:
+        count2_map[c] += 1
+        
+    all_chars = set(count1_map.keys()).union(set(count2_map.keys()))
+    
+    for c in all_chars:
+        
+        if count1_map[c] > count2_map[c]:
+            to_remove1.add(c)
+        
+        if count2_map[c] > count1_map[c]:
+            to_remove2.add(c)
+    
+    if len(to_remove1) <=1 and len(to_remove2) <=1:
+        return True
+    else:
+        return False
+            
+def getSequence(dna: List[List[str]])->List[bool]:
+    
+    result = []
+    
+    for dna_seq in dna:
+        seq1 = dna_seq[0]
+        seq2 = dna_seq[1]
+        
+        result.append(is_anagram(seq1 , seq2))
+    return result
+    
+
+# Time complexity :
+# O(n* (m1 + m2 )
+
+#Space complexity : 
+#O(n+m1+m2)
