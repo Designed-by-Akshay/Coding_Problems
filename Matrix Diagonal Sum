@@ -54,6 +54,22 @@ class Solution:
 
         return total_sum  # Return the calculated total sum
 
+
+class Solution:
+    def diagonalSum(self, mat):
+        n = len(mat)  # Get the size of the matrix
+        total_sum = 0  # Initialize the total sum
+        
+        # Loop through each row
+        for i in range(n):
+            total_sum += mat[i][i] + mat[i][n-i-1]  # Add primary and secondary diagonal elements
+        
+        # If n is odd, subtract the central element
+        if n % 2 != 0:
+            total_sum -= mat[n//2][n//2]
+        return total_sum  # Return the calculated total sum
+    
+
 #Time complexity:
 #O(n)
 #Space complexity
