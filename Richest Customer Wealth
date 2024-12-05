@@ -42,7 +42,9 @@ class Solution:
         return max_wealth
 
 #Time complexity
-#O(n^2)
+#O(M X N)
+#M -> number of customers
+#N -> number of Accounts per customer
 #Space complexity
 #O(1)
 
