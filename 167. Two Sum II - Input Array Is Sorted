@@ -79,5 +79,28 @@ class Solution:
 
     #[-1,0,0,1,2] ->[4,5] target =3
 
+class Solution:
+    def twoSum(self, numbers: List[int], target: int) -> List[int]:
+        seen_map ={}
+
+        for i, num in enumerate(numbers):
+            compliment = target - num
+            if compliment in seen_map:
+                return [seen_map[compliment],i+1]
+            seen_map[num]=i+1
+        return[]
+
+    
+    # Time complexity: O(n)
+    # Space compl;exit : o(1)
+
+    # dRY RUN
+
+    #twoSum(self, numbers: List[int], target: int) -> List[int]:
+    # numbers = [] - >[]
+
+    #[-1,0,0,1,2] ->[4,5] target =3
+
+
 
 
