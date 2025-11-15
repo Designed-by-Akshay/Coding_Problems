@@ -1,0 +1,176 @@
+📚 PART 1: PATTERNS (Learn in THIS exact order)
+PATTERN 1: Basic Stack Operations ⭐ START HERE
+What: Push, pop, peek, isEmpty
+Why learn first: Foundation for everything else
+Key concept: LIFO (Last In First Out) - like a stack of plates
+Template:
+pythonstack = []
+stack.append(x)    # push
+stack.pop()        # pop (always check if stack: first!)
+stack[-1]          # peek (always check if stack: first!)
+len(stack) == 0    # isEmpty
+When to use:
+
+Tracking opening/closing pairs (parentheses, tags)
+Reversing order
+Undo operations
+Backtracking
+
+
+PATTERN 2: Stack with HashMap/Set ⭐⭐
+What: Stack + dictionary for fast lookups
+Why: Some problems need both order tracking (stack) AND fast "have I seen this?" checks (hashmap)
+Template:
+pythonstack = []
+seen = set()  # or dict for mappings
+
+# Check if in set, then push
+if x not in seen:
+    stack.append(x)
+    seen.add(x)
+When to use:
+
+Matching problems (like matching parentheses types)
+Avoiding duplicates while maintaining order
+
+
+PATTERN 3: Monotonic Stack (Next Greater/Smaller) ⭐⭐⭐ CRITICAL
+What: Stack that stays sorted (always increasing OR always decreasing)
+Why: Finds "next bigger/smaller" in O(n) instead of O(n²)
+Template:
+pythondef nextGreater(nums):
+    result = [-1] * len(nums)
+    stack = []  # stores INDICES, decreasing order
+    
+    for i in range(len(nums)):
+        # Pop all smaller elements - they found their answer!
+        while stack and nums[i] > nums[stack[-1]]:
+            idx = stack.pop()
+            result[idx] = nums[i]
+        stack.append(i)
+    
+    return result
+When to use:
+
+"Next greater/smaller element"
+Temperature/stock span problems
+Any "find the next X that is larger/smaller"
+
+
+PATTERN 4: Monotonic Stack (Histogram/Area) ⭐⭐⭐⭐ GOOGLE FAVORITE
+What: Special monotonic stack for calculating max areas
+Why: THE pattern for rectangle/histogram problems at Google
+Template:
+pythondef largestRectangle(heights):
+    stack = []  # stores INDICES, increasing order
+    max_area = 0
+    heights.append(0)  # sentinel to flush all bars
+    
+    for i in range(len(heights)):
+        # When current is SMALLER, calculate area with popped bar
+        while stack and heights[i] < heights[stack[-1]]:
+            h = heights[stack.pop()]
+            w = i if not stack else i - stack[-1] - 1
+            max_area = max(max_area, h * w)
+        stack.append(i)
+    
+    return max_area
+When to use:
+
+"Largest rectangle" problems
+"Maximum area" with bars/heights
+Trapping water
+
+
+PATTERN 5: Expression Evaluation ⭐⭐⭐
+What: Stack to handle operators and numbers
+Why: Calculators, formula parsing
+Template:
+pythondef calculate(s):
+    stack = []
+    num = 0
+    operator = '+'
+    
+    for i, char in enumerate(s):
+        if char.isdigit():
+            num = num * 10 + int(char)
+        
+        if char in '+-*/' or i == len(s) - 1:
+            if operator == '+':
+                stack.append(num)
+            elif operator == '-':
+                stack.append(-num)
+            elif operator == '*':
+                stack.append(stack.pop() * num)
+            elif operator == '/':
+                stack.append(int(stack.pop() / num))
+            
+            operator = char
+            num = 0
+    
+    return sum(stack)
+When to use:
+
+Calculator problems
+Expression parsing
+Operator precedence
+
+
+PATTERN 6: Nested Structures (Stack of States) ⭐⭐⭐
+What: Stack stores tuples/pairs to track nested levels
+Why: Handle brackets within brackets, recursion without recursion
+Template:
+pythondef decodeString(s):
+    stack = []
+    curr_str = ""
+    curr_num = 0
+    
+    for char in s:
+        if char.isdigit():
+            curr_num = curr_num * 10 + int(char)
+        elif char == '[':
+            # Save current state
+            stack.append((curr_str, curr_num))
+            curr_str = ""
+            curr_num = 0
+        elif char == ']':
+            # Restore and build
+            prev_str, num = stack.pop()
+            curr_str = prev_str + curr_str * num
+        else:
+            curr_str += char
+    
+    return curr_str
+When to use:
+
+Nested brackets/parentheses with content
+Decode string problems
+Tree/iterator problems
+
+
+PATTERN 7: Stack Design Problems ⭐⭐
+What: Implement data structure using stack(s)
+Why: Tests your understanding of stack properties
+Common designs:
+
+Min Stack (track minimum)
+Queue using 2 stacks
+Browser history (2 stacks: back, forward)
+
+Template (Min Stack):
+pythonclass MinStack:
+    def __init__(self):
+        self.stack = []  # stores (value, current_min)
+    
+    def push(self, val):
+        curr_min = min(val, self.stack[-1][1]) if self.stack else val
+        self.stack.append((val, curr_min))
+    
+    def pop(self):
+        self.stack.pop()
+    
+    def top(self):
+        return self.stack[-1][0]
+    
+    def getMin(self):
+        return self.stack[-1][1]
